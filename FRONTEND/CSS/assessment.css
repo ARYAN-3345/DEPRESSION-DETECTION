@@ -1,0 +1,44 @@
+/* =========================
+   ASSESSMENT PAGE STYLES
+========================= */
+
+/* Grid Layout */
+.assessment-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* Option Card */
+.option-card {
+    text-align: center;
+    transition: 0.3s;
+}
+
+.option-card:hover {
+    transform: translateY(-8px);
+}
+
+/* Icons */
+.option-icon {
+    width: 70px;
+    height: 70px;
+    margin: auto;
+    margin-bottom: 15px;
+
+    border-radius: 18px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 26px;
+}
+
+/* Full width button */
+.full-width {
+    width: 100%;
+}  

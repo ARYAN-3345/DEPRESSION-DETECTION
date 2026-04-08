@@ -1,0 +1,53 @@
+/* =========================
+   REGISTER PAGE STYLES
+========================= */
+
+.register-wrapper {
+    width: 100%;
+    max-width: 400px;
+}
+
+/* Reuse same structure as login */
+.text-center {
+    text-align: center;
+}
+
+/* Logo */
+.logo-box {
+    width: 80px;
+    height: 80px;
+    margin: auto;
+    margin-bottom: 20px;
+    border-radius: 20px;
+
+    background: linear-gradient(to right, var(--secondary), var(--accent));
+    color: white;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 28px;
+}
+
+/* Full width button */
+.full-width {
+    width: 100%;
+}
+
+/* Login text */
+.login-text {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+.login-text a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-text a:hover {
+    text-decoration: underline;
+}
