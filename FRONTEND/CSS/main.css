@@ -1,0 +1,62 @@
+/* =========================
+   DASHBOARD PAGE STYLES
+========================= */
+
+/* Sidebar */
+.sidebar {
+    position: fixed;
+    width: 240px;
+    height: 100vh;
+    background: white;
+    padding: 20px;
+    box-shadow: 2px 0 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+    transform: translateX(0);
+}
+
+.-translate-x-full {
+    transform: translateX(-100%);
+}
+
+.hidden {
+    display: none;
+}
+
+/* Sidebar Title */
+.sidebar-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+}
+
+/* Navigation */
+.sidebar nav a {
+    display: block;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: 0.2s;
+}
+
+.sidebar nav a:hover {
+    background: #f3f4f6;
+}
+
+/* Active link */
+.sidebar nav a.active {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    font-weight: 600;
+}
+
+/* Main content */
+.main-content {
+    margin-left: 240px;
+    padding: 30px;
+}
+
+/* Center text */
+.text-center {
+    text-align: center;
+}

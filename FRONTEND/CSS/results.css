@@ -1,0 +1,17 @@
+/* =========================
+   RESULTS PAGE STYLES
+========================= */
+
+.result-card {
+    margin-top: 20px;
+}
+
+/* Recommendations */
+.recommendations-list {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.recommendations-list li {
+    margin-bottom: 8px;
+}

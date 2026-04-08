@@ -4,111 +4,133 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Text Quiz - Mental Wellness</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/text-quiz.css">
+
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
-<body class="bg-gradient-to-br from-indigo-50 via-white to-pink-50 min-h-screen">
-    
-    <!-- Sidebar -->
-    <div id="sidebar" class="fixed left-0 top-0 h-full w-72 bg-white shadow-2xl z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
-        <div class="p-8">
-            <div class="flex items-center mb-8">
-                <i class="fas fa-brain text-3xl text-blue-600 mr-3"></i>
-                <h2 class="text-2xl font-bold text-gray-800">Mental Wellness</h2>
-            </div>
-            <nav class="space-y-4">
-                <a href="main.html" class="flex items-center p-3 rounded-xl hover:bg-gray-100">
-                    <i class="fas fa-home w-6 mr-3"></i> Dashboard
-                </a>
-                <a href="assessment.html" class="flex items-center p-3 rounded-xl bg-blue-50 text-blue-700 font-medium">
-                    <i class="fas fa-clipboard-list w-6 mr-3"></i> Assessment
-                </a>
-                <a href="text-quiz.html" class="flex items-center p-3 rounded-xl bg-emerald-50 text-emerald-700 font-medium">
-                    <i class="fas fa-keyboard w-6 mr-3"></i> Text Quiz
-                </a>
-                <a href="video-analysis.html" class="flex items-center p-3 rounded-xl hover:bg-gray-100">
-                    <i class="fas fa-video w-6 mr-3"></i> Video Analysis
-                </a>
-                <a href="index.html" class="flex items-center p-3 rounded-xl hover:bg-gray-100">
-                    <i class="fas fa-sign-out-alt w-6 mr-3"></i> Logout
-                </a>
-            </nav>
-        </div>
+
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <h2 class="sidebar-title">🧠 Wellness</h2>
+
+    <nav>
+        <a href="main.html"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="assessment.html" class="active"><i class="fas fa-clipboard-list"></i> Assessment</a>
+        <a href="results.html"><i class="fas fa-chart-line"></i> Results</a>
+        <a href="index.html"><i class="fas fa-sign-out-alt"></i> Logout</a>
+    </nav>
+</div>
+
+<!-- Main -->
+<div class="main-content">
+<div class="container fade-in">
+
+    <div class="card text-center">
+        <h1 class="title">Depression Assessment Quiz</h1>
+        <p class="subtitle">Select how often you felt this way</p>
+        <p class="scale-info">
+            0 = Not at all | 1 = Several days | 2 = More than half | 3 = Nearly every day
+        </p>
     </div>
 
-    <button id="mobileMenuBtn" class="fixed top-6 left-6 z-50 lg:hidden p-3 bg-white rounded-xl shadow-lg">
-        <i class="fas fa-bars text-xl"></i>
-    </button>
-    <div id="overlay" class="fixed inset-0 bg-black/50 z-30 lg:hidden hidden"></div>
+    <form id="quizForm" class="card">
 
-    <!-- Main Content -->
-    <main class="ml-0 lg:ml-72 p-8 pt-24 lg:pt-12">
-        <div class="max-w-2xl mx-auto">
-            <!-- Progress Bar -->
-            <div class="mb-12">
-                <div class="flex justify-between text-sm text-gray-500 mb-2">
-                    <span>Question <span id="currentQuestion">1</span> of 5</span>
-                    <span id="progressText">20%</span>
-                </div>
-                <div class="w-full bg-gray-200 rounded-full h-3">
-                    <div id="progressBar" class="bg-gradient-to-r from-blue-500 to-purple-500 h-3 rounded-full transition-all duration-500" style="width: 20%"></div>
-                </div>
-            </div>
-
-            <!-- Question Container -->
-            <div id="quizContainer" class="bg-white rounded-3xl shadow-xl p-10 mb-8">
-                <div class="text-center mb-8">
-                    <div class="w-20 h-20 bg-blue-100 rounded-2xl mx-auto mb-6 flex items-center justify-center">
-                        <i class="fas fa-comment-dots text-3xl text-blue-600"></i>
-                    </div>
-                    <h2 class="text-3xl font-bold text-gray-800 mb-4" id="questionTitle">How have you been feeling lately?</h2>
-                    <p class="text-gray-600 text-lg" id="questionDesc">Please describe your emotions and experiences in your own words.</p>
-                </div>
-
-                <div class="space-y-4">
-                    <textarea id="answerInput" rows="6" 
-                              class="w-full p-6 border-2 border-gray-200 rounded-2xl focus:border-blue-500 focus:ring-2 focus:ring-blue-100 resize-vertical transition-all duration-200 text-lg placeholder-gray-400"
-                              placeholder="Tell us how you're feeling... Be as detailed as you'd like."></textarea>
-                    
-                    <div class="flex gap-4 pt-4">
-                        <button id="prevBtn" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 font-medium transition-all flex items-center justify-center">
-                            <i class="fas fa-arrow-left mr-2"></i> Previous
-                        </button>
-                        <button id="nextBtn" class="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-medium hover:shadow-lg transition-all flex items-center justify-center">
-                            <i class="fas fa-arrow-right mr-2"></i> Next
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Switch -->
-            <div class="text-center bg-gradient-to-r from-purple-50 to-pink-50 p-6 rounded-2xl border-2 border-purple-100">
-                <p class="text-gray-600 mb-4">Prefer video analysis instead?</p>
-                <a href="video-analysis.html" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl hover:shadow-lg transition-all font-medium">
-                    <i class="fas fa-video mr-2"></i> Switch to Video
-                </a>
-            </div>
+        <!-- Questions -->
+        <div class="question">
+            <p>1. Little interest or pleasure in doing things?</p>
+            <select class="input" required>
+                <option value="">Select</option>
+                <option value="0">Not at all</option>
+                <option value="1">Several days</option>
+                <option value="2">More than half</option>
+                <option value="3">Nearly every day</option>
+            </select>
         </div>
-    </main>
 
-    <!-- Contact Footer -->
-    <footer class="mt-24 bg-white/50 backdrop-blur-xl border-t border-gray-200">
-        <div class="max-w-6xl mx-auto px-8 py-12">
-            <div class="text-center">
-                <h3 class="text-2xl font-bold text-gray-800 mb-4">Need Help Right Now?</h3>
-                <div class="flex flex-wrap justify-center gap-6 text-lg">
-                    <a href="mailto:support@mentalwellness.com" class="flex items-center text-blue-600 hover:text-blue-700">
-                        <i class="fas fa-envelope mr-2"></i> Email Support
-                    </a>
-                    <a href="tel:+1234567890" class="flex items-center text-green-600 hover:text-green-700">
-                        <i class="fas fa-phone mr-2"></i> Call +1 (234) 567-890
-                    </a>
-                </div>
-            </div>
+        <div class="question">
+            <p>2. Feeling down, depressed, or hopeless?</p>
+            <select class="input" required>...</select>
         </div>
-    </footer>
 
-    <script src="script.js"></script>
+        <div class="question">
+            <p>3. Trouble sleeping?</p>
+            <select class="input" required>...</select>
+        </div>
+
+        <div class="question">
+            <p>4. Feeling tired or low energy?</p>
+            <select class="input" required>...</select>
+        </div>
+
+        <div class="question">
+            <p>5. Poor appetite or overeating?</p>
+            <select class="input" required>...</select>
+        </div>
+
+        <div class="question">
+            <p>6. Feeling bad about yourself?</p>
+            <select class="input" required>...</select>
+        </div>
+
+        <div class="question">
+            <p>7. Trouble concentrating?</p>
+            <select class="input" required>...</select>
+        </div>
+
+        <div class="question">
+            <p>8. Moving slowly or restless?</p>
+            <select class="input" required>...</select>
+        </div>
+
+        <div class="question">
+            <p>9. Thoughts of self-harm?</p>
+            <select class="input" required>...</select>
+        </div>
+
+        <br>
+
+        <button class="btn btn-primary full-width" type="submit" id="submitBtn">
+            Submit Assessment
+        </button>
+
+    </form>
+
+</div>
+</div>
+
+<script>
+document.getElementById('quizForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const selects = document.querySelectorAll('select');
+    const answers = [];
+
+    selects.forEach(sel => {
+        answers.push(parseInt(sel.value));
+    });
+
+    const btn = document.getElementById("submitBtn");
+    btn.innerHTML = "Analyzing...";
+    btn.disabled = true;
+
+    const res = await fetch('http://127.0.0.1:5000/predict_quiz', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers: answers })
+    });
+
+    const data = await res.json();
+
+    localStorage.setItem("result", JSON.stringify(data));
+
+    window.location.href = "results.html";
+});
+</script>
+
 </body>
 </html>
