@@ -2,3 +2,6 @@ pyaudio
 librosa
 numpy
 soundfile
+opencv-python
+tensorflow
+keras
