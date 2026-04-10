@@ -8,3 +8,5 @@ keras
 mtcnn  
 matplotlib 
 scikit-learn
+flask
+flask-cors
