@@ -3,25 +3,103 @@
 {% block title %}Dashboard{% endblock %}
 {% block dash_active %}active{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+{% endblock %}
+
 {% block content %}
 
 <div class="container fade-in">
 
-    <div class="card text-center">
-        <h1 class="title">Welcome to Your Wellness Dashboard</h1>
-        <p class="subtitle">
-            Use AI-powered tools to assess and track your mental wellness.
+    <!-- HERO SECTION -->
+    <div class="hero-section card text-center">
+        <p class="badge">✨ AI-Powered Mental Health</p>
+
+        <h1 class="hero-title">
+            Understand Your Mental Health <br> Like Never Before
+        </h1>
+
+        <p class="hero-subtitle">
+            Scientifically backed assessments with AI-driven insights.
         </p>
+
+        <div class="hero-actions">
+            <a href="{{ url_for('assessment') }}" class="btn btn-primary">
+                Start Assessment →
+            </a>
+
+            <a href="{{ url_for('results_page') }}" class="btn btn-secondary">
+                View Results
+            </a>
+        </div>
     </div>
 
-    <div class="card text-center">
-        <h2 class="title">Start Your Assessment</h2>
-        <p class="subtitle">Choose a method to begin</p>
+    <!-- FEATURES -->
+    <div class="section-title text-center">
+        <h2>Why Choose DepreSenseX?</h2>
+        <p>Smart, private, and personalized mental health insights</p>
+    </div>
 
-        <br>
+    <div class="features-grid">
+
+        <div class="card feature-card">
+            <div class="icon">🧠</div>
+            <h3>AI Analysis</h3>
+            <p>Analyze text, voice and facial patterns.</p>
+        </div>
+
+        <div class="card feature-card">
+            <div class="icon">📊</div>
+            <h3>Progress Tracking</h3>
+            <p>Track your mental health journey over time.</p>
+        </div>
+
+        <div class="card feature-card">
+            <div class="icon">🔒</div>
+            <h3>Privacy First</h3>
+            <p>Your data is secure and never shared.</p>
+        </div>
+
+        <div class="card feature-card">
+            <div class="icon">✨</div>
+            <h3>Personalized Insights</h3>
+            <p>Get tailored recommendations.</p>
+        </div>
+
+    </div>
+
+    <!-- ASSESSMENTS -->
+    <div class="section-title text-center">
+        <h2>Assessments</h2>
+        <p>Choose how you want to analyze your mental health</p>
+    </div>
+
+    <div class="assessment-row">
+
+        <a href="{{ url_for('text_quiz') }}" class="assessment-card">
+            ✔ PHQ-9 Quiz
+        </a>
+
+        <a href="{{ url_for('analyze_video') }}" class="assessment-card">
+            ✔ Video Analysis
+        </a>
+
+        <a href="{{ url_for('assessment') }}" class="assessment-card">
+            ✔ Full AI Assessment
+        </a>
+
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-box text-center">
+        <h2>Start Your Mental Health Journey Today</h2>
+        <p>
+            Take the first step towards better mental health.
+            It takes less than 2 minutes.
+        </p>
 
         <a href="{{ url_for('assessment') }}" class="btn btn-primary">
-            🚀 Start Assessment
+            Get Started →
         </a>
     </div>
 

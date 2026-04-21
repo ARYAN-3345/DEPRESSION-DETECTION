@@ -11,12 +11,93 @@
 
 <div class="container fade-in">
 
-    <div class="card text-center">
-        <h1 class="title">Choose Your Assessment</h1>
-        <p class="subtitle">Select how you want to evaluate your mental wellness</p>
+    <!-- HEADER -->
+    <div class="text-center">
+        <h1 class="title">Choose Assessment Type</h1>
+        <p class="subtitle">
+            Select the type of assessment that works best for you.
+        </p>
     </div>
 
-    <!-- same content -->
+    <!-- CARDS -->
+    <div class="assessment-grid">
+
+        <!-- TEXT QUIZ -->
+        <div class="card assessment-card">
+            <div class="icon">📄</div>
+            <h3>Text Quiz</h3>
+            <p class="time">⏱ 5-10 min</p>
+
+            <p class="desc">
+                Answer questions based on your recent feelings.
+            </p>
+
+            <ul>
+                <li>✔ PHQ-9 based</li>
+                <li>✔ Instant scoring</li>
+                <li>✔ Clinically inspired</li>
+            </ul>
+
+            <a href="{{ url_for('text_quiz') }}" class="btn btn-primary full-width">
+                Start →
+            </a>
+        </div>
+
+        <!-- VOICE -->
+        <div class="card assessment-card">
+            <div class="icon">🎤</div>
+            <h3>Voice Analysis</h3>
+            <p class="time">⏱ 3–5 min</p>
+
+            <p class="desc">
+                Upload or record voice/video to detect emotional patterns.
+            </p>
+
+            <ul>
+                <li>✔ Emotion detection</li>
+                <li>✔ Non-verbal cues</li>
+                <li>✔ Quick results</li>
+            </ul>
+
+            <a href="{{ url_for('video_analysis') }}" class="btn btn-primary full-width">
+                Start →
+            </a>
+        </div>
+
+        <!-- FULL AI -->
+        <div class="card assessment-card recommended">
+
+            <span class="badge">Recommended</span>
+
+            <div class="icon">🧠</div>
+            <h3>Full AI Assessment</h3>
+            <p class="time">⏱ 10–15 min</p>
+
+            <p class="desc">
+                Combine quiz + video for more accurate results.
+            </p>
+
+            <ul>
+                <li>✔ Multi-modal analysis</li>
+                <li>✔ Better accuracy</li>
+                <li>✔ Smart insights</li>
+            </ul>
+
+            <a href="{{ url_for('full_assessment') }}" class="btn btn-primary full-width">
+                Start →
+            </a>
+        </div>
+
+    </div>
+
+    <!-- PRIVACY -->
+    <div class="card privacy-box">
+        <strong>🔒 Privacy First</strong>
+        <p>
+            Your data is encrypted and never shared.
+        </p>
+    </div>
+
 </div>
 
 {% endblock %}

@@ -1,17 +1,177 @@
-/* =========================
-   RESULTS PAGE STYLES
-========================= */
-
-.result-card {
-    margin-top: 20px;
+.results-wrapper {
+    padding: 40px;
 }
 
-/* Recommendations */
-.recommendations-list {
+/* ===================== */
+/* 🔥 SUMMARY CARD */
+/* ===================== */
+.summary-card {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
+
+    background: rgba(255,255,255,0.85);
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 25px;
+
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.label {
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+.summary-center h1 {
+    font-size: 48px;
+}
+
+.badge {
+    padding: 10px 20px;
+    border-radius: 30px;
+    color: white;
+    font-weight: bold;
+}
+
+.badge.low { background: #10b981; }
+.badge.medium { background: #f59e0b; }
+.badge.high { background: #ef4444; }
+
+/* improvement */
+.summary-improvement {
+    grid-column: span 3;
     margin-top: 15px;
-    padding-left: 20px;
 }
 
-.recommendations-list li {
+.improve {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+}
+
+.positive { background: #d1fae5; color: #065f46; }
+.negative { background: #fee2e2; color: #991b1b; }
+.neutral { background: #e5e7eb; color: #374151; }
+
+
+/* ===================== */
+/* 🎯 BUTTONS */
+/* ===================== */
+.action-row {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.btn-primary {
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: #e5e7eb;
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+}
+
+.btn-outline {
+    border: 2px solid #ddd;
+    padding: 12px 20px;
+    border-radius: 12px;
+    text-decoration: none;
+}
+
+
+/* ===================== */
+/* 📊 INSIGHTS */
+/* ===================== */
+.insight-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.insight-card {
+    padding: 20px;
+}
+
+
+/* ===================== */
+/* 📜 HISTORY */
+/* ===================== */
+.history-section {
+    padding: 25px;
+}
+
+.history-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+/* LEVEL SECTION */
+.level-section {
+    text-align: center;
+}
+
+/* LABEL */
+.level-label {
+    font-size: 14px;
+    color: var(--text-light);
     margin-bottom: 8px;
+}
+
+/* BADGE BASE */
+.level-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* DOT */
+.level-badge .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+/* LOW */
+.level-badge.low {
+    background: rgba(16, 185, 129, 0.15);
+    color: #059669;
+}
+
+.level-badge.low .dot {
+    background: #10b981;
+}
+
+/* MODERATE */
+.level-badge.moderate {
+    background: rgba(245, 158, 11, 0.15);
+    color: #d97706;
+}
+
+.level-badge.moderate .dot {
+    background: #f59e0b;
+}
+
+/* HIGH */
+.level-badge.high {
+    background: rgba(239, 68, 68, 0.15);
+    color: #dc2626;
+}
+
+.level-badge.high .dot {
+    background: #ef4444;
 }

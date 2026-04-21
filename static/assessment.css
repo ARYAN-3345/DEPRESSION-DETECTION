@@ -2,26 +2,35 @@
    ASSESSMENT PAGE STYLES
 ========================= */
 
-/* Grid Layout */
+/* HEADER */
+.text-center {
+    text-align: center;
+}
+
+/* GRID */
 .assessment-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr); /* 🔥 FIXED */
     gap: 25px;
     margin-top: 30px;
 }
 
-/* Option Card */
-.option-card {
+/* CARD */
+.assessment-card {
     text-align: center;
+    position: relative;
     transition: 0.3s;
+    cursor: pointer;
+    border: 2px solid transparent;
 }
 
-.option-card:hover {
-    transform: translateY(-8px);
+.assessment-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border: 2px solid var(--primary);
 }
 
-/* Icons */
-.option-icon {
+/* ICON */
+.icon {
     width: 70px;
     height: 70px;
     margin: auto;
@@ -35,10 +44,70 @@
     align-items: center;
     justify-content: center;
 
-    font-size: 26px;
+    font-size: 28px;
 }
 
-/* Full width button */
+/* TIME */
+.time {
+    color: var(--text-light);
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+/* DESCRIPTION */
+.desc {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 15px;
+}
+
+/* LIST */
+.assessment-card ul {
+    text-align: left;
+    margin-bottom: 20px;
+    padding-left: 10px;
+}
+
+.assessment-card ul li {
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+/* BUTTON FULL */
 .full-width {
     width: 100%;
-}  
+}
+
+/* BADGE */
+.badge {
+    position: absolute;
+    top: -10px;
+    right: 20px;
+    background: var(--primary);
+    color: white;
+    font-size: 12px;
+    padding: 5px 12px;
+    border-radius: 12px;
+}
+
+/* RECOMMENDED CARD */
+.recommended {
+    border: 2px solid var(--primary);
+    box-shadow: 0 15px 40px rgba(37, 99, 235, 0.2);
+}
+
+/* PRIVACY BOX */
+.privacy-box {
+    margin-top: 30px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .assessment-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -3,9 +3,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_cors import CORS
 import sqlite3
 import os
-
-# Import your modules
+import smtplib
+import random
+import time
 from modules.quiz import predict_result
+from db import get_db, init_db
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -16,7 +18,6 @@ app.secret_key = "super_secret_key_123"
 # PATH SETUP
 # ==============================
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "database", "users.db")
 TEMP_PATH = os.path.join(BASE_DIR, "temp")
 
 os.makedirs(os.path.join(BASE_DIR, "database"), exist_ok=True)
@@ -25,36 +26,75 @@ os.makedirs(TEMP_PATH, exist_ok=True)
 # ==============================
 # INIT DATABASE
 # ==============================
-def init_db():
-    conn = sqlite3.connect(DB_PATH)
-    cursor = conn.cursor()
-
-    # USERS TABLE
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        email TEXT UNIQUE,
-        password TEXT
-    )
-    """)
-
-    # RESULTS TABLE
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS results (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_email TEXT,
-        prediction TEXT,
-        score INTEGER,
-        type TEXT,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )
-    """)
-
-    conn.commit()
-    conn.close()
-
 init_db()
 
+# ==============================
+# OTP SYSTEM
+# ==============================
+otp_storage = {}
+GMAIL = "depresensex@gmail.com"
+APP_PASSWORD = "ntpf gyvg aiws icic"
+
+def send_otp(email):
+    otp = str(random.randint(100000, 999999))
+
+    otp_storage[email] = {
+        "otp": otp,
+        "time": time.time()
+    }
+
+    subject = "Your OTP for DepreSenseX"
+    body = f"Your OTP is: {otp} (valid for 5 minutes)"
+    message = f"Subject: {subject}\n\n{body}"
+
+    server = smtplib.SMTP("smtp.gmail.com", 587)
+    server.starttls()
+    server.login(GMAIL, APP_PASSWORD)
+    server.sendmail(GMAIL, email, message)
+    server.quit()
+
+@app.route("/send_otp", methods=["POST"])
+def send():
+    email = request.form.get("email")
+
+    if not email:
+        return {"status": "error", "message": "Email required"}
+    
+    if email in otp_storage:
+        if time.time() - otp_storage[email]["time"] < 30:
+            return {"status": "error", "message": "Wait before requesting again"}
+
+    try:
+        send_otp(email)
+        return {"status": "success"}
+    except:
+        return {"status": "error", "message": "Failed to send OTP"}
+
+@app.route("/verify_otp", methods=["POST"])
+def verify_otp():
+    for key in list(otp_storage.keys()):
+        if time.time() - otp_storage[key]["time"] > 300:
+            otp_storage.pop(key)
+        
+    email = request.form.get("email")
+    otp = request.form.get("otp")
+
+    record = otp_storage.get(email)
+
+    if not record:
+        return {"status": "error", "message": "OTP not sent"}
+
+    if time.time() - record["time"] > 300:
+        otp_storage.pop(email)
+        return {"status": "error", "message": "OTP expired"}
+
+    if record["otp"] != otp:
+        return {"status": "error", "message": "Invalid OTP"}
+
+    session["otp_verified_email"] = email
+    otp_storage.pop(email)
+
+    return {"status": "success"}
 
 # ==============================
 # REGISTER
@@ -62,35 +102,55 @@ init_db()
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
+
+        name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
+
+        # validation
+        if not name or not email or not password:
+            flash("All fields required", "error")
+            return redirect('/register')
+
+        # OTP check
+        if session.get("otp_verified_email") != email:
+            flash("Please verify OTP first", "error")
+            return redirect('/register')
 
         hashed_password = generate_password_hash(password)
 
         try:
-            conn = sqlite3.connect(DB_PATH)
+            conn = get_db()
             cursor = conn.cursor()
 
             cursor.execute(
-                "INSERT INTO users (email, password) VALUES (?, ?)",
-                (email, hashed_password)
+                "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
+                (name, email, hashed_password)
             )
 
             conn.commit()
             conn.close()
 
-            return redirect(url_for('home'))
+            # clear OTP session
+            session.pop("otp_verified_email", None)
 
-        except:
-            return "User already exists"
+            flash("Account created successfully", "success")
+            return redirect('/')
+
+        except sqlite3.IntegrityError:
+            flash("User already exists", "error")
+            return redirect('/register')
 
     return render_template("register.html")
-    
+
 # ==============================
 # HOME
 # ==============================
 @app.route('/')
 def home():
+    if 'user' in session:
+        return redirect('/main')
+    
     return render_template("index.html")
 
 # ==============================
@@ -101,8 +161,11 @@ def login():
     email = request.form.get('email')
     password = request.form.get('password')
 
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    if not email or not password:
+        flash("Enter email and password", "error")
+        return redirect('/')
+
+    conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("SELECT * FROM users WHERE email=?", (email,))
@@ -112,98 +175,110 @@ def login():
 
     if not user:
         flash("User does not exist", "error")
-        return redirect("/")
+        return redirect('/')
 
     if not check_password_hash(user["password"], password):
         flash("Incorrect password", "error")
-        return redirect("/")
-    
+        return redirect('/')
+
     session['user'] = email
-    return redirect("/main")
+    session['user_name'] = user["name"]
+    session.permanent = True
+
+    return redirect('/main')
 
 # ==============================
-# MAIN
+# MAIN DASHBOARD
 # ==============================
 @app.route('/main')
 def main():
-    return render_template("main.html")
-
-# ==============================
-# ASSESSMENT
-# ==============================
-@app.route('/assessment', methods=['GET'])
-def assessment():
-    return render_template('assessment.html')
-
-# ==============================
-# RESULT
-# ==============================
-@app.route('/results_page', methods=['GET'])
-def results_page():
     if 'user' not in session:
         return redirect(url_for('home'))
 
-    conn = sqlite3.connect(DB_PATH)
-    conn.row_factory = sqlite3.Row
+    conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT prediction, score, type, created_at
+        SELECT prediction, score, type, date
         FROM results
-        WHERE user_email = ?
-        ORDER BY created_at DESC
+        WHERE user_email=?
+        ORDER BY date DESC
     """, (session['user'],))
 
     rows = cursor.fetchall()
     conn.close()
 
-    results = []
-    for row in rows:
-        results.append({
-            "prediction": row[0],
-            "score": row[1],
-            "type": row[2],
-            "date": row[3]
-        })
+    has_data = len(rows) > 0
 
-    latest = results[0] if results else None
-
-    return render_template("results.html", results=results, latest=latest)
+    return render_template(
+        "main.html",
+        has_data=has_data,
+        results=rows,
+        user_name=session.get("user_name")
+    )
 
 # ==============================
-# TEXT-QUIZ
+# ASSESSMENT PAGE
 # ==============================
-@app.route('/text_quiz', methods=['POST'])
-def predict_quiz():
+@app.route('/assessment')
+def assessment():
     if 'user' not in session:
         return redirect(url_for('home'))
 
-    answers = []
-    for i in range(1, 10):
-        val = request.form.get(f'q{i}')
-        if val is None:
-            return "Invalid input"
-        answers.append(int(val))
+    return render_template('assessment.html', user_name=session.get("user_name"))
+
+# ==============================
+# TEXT QUIZ
+# ==============================
+@app.route('/text_quiz', methods=['GET'])
+def text_quiz_page():
+    if 'user' not in session:
+        return redirect(url_for('home'))
+
+    return render_template("text-quiz.html", user_name=session.get("user_name"))
+
+
+@app.route('/text_quiz', methods=['POST'])
+def text_quiz():
+
+    if 'user' not in session:
+        return jsonify({"status": "error"})
+
+    data = request.get_json()
+    answers = data.get("answers")
+
+    if not answers or len(answers) != 9:
+        return jsonify({"status": "error", "message": "Invalid answers"})
+    
+    if any(a is None for a in answers):
+        return jsonify({"status": "error", "message": "Incomplete answers"})
 
     result = predict_result(answers)
 
-    conn = sqlite3.connect(DB_PATH)
+    prediction = result["prediction"]
+
+    raw_score = sum(answers)
+    score = int((raw_score / 27) * 100)
+    
+    conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO results (user_email, prediction, score, type)
-        VALUES (?, ?, ?, ?)
+    INSERT INTO results (user_email, prediction, score, type, details, confidence)
+    VALUES (?, ?, ?, ?, ?, ?)
     """, (
         session['user'],
-        result.get("prediction"),
-        result.get("score", 0),
-        "quiz"
+        prediction,
+        score,
+        "quiz",
+        str(answers),
+        0
     ))
 
     conn.commit()
     conn.close()
 
-    return redirect(url_for('results_page'))
+    return jsonify({"status": "success"})
 
 # ==============================
 # VIDEO ANALYSIS
@@ -213,43 +288,36 @@ def analyze_video():
     if 'user' not in session:
         return redirect(url_for('home'))
 
-    if 'video' not in request.files:
-        return "No video uploaded"
+    file = request.files.get('video')
 
-    file = request.files['video']
+    if not file:
+        return "No file"
 
-    if file.filename == "":
-        return "No file selected"
-
-    # Save file
-    file_path = os.path.join(TEMP_PATH, "temp.webm")
+    file_path = os.path.join(TEMP_PATH, f"{session['user']}_temp.webm")
     file.save(file_path)
 
-    # PLACEHOLDER ANALYSIS
-    voice_score = 1
-    face_score = 1
-
-    final_score = voice_score + face_score
-
-    if final_score <= 1:
+    # Placeholder
+    final_score = random.randint(30, 80)
+    if final_score < 33:
         label = "Low"
-    elif final_score <= 3:
+    elif final_score < 66:
         label = "Medium"
     else:
         label = "High"
 
-    # SAVE RESULT
-    conn = sqlite3.connect(DB_PATH)
+    conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("""
-        INSERT INTO results (user_email, prediction, score, type)
-        VALUES (?, ?, ?, ?)
+    INSERT INTO results (user_email, prediction, score, type, details, confidence)
+    VALUES (?, ?, ?, ?, ?, ?)
     """, (
         session['user'],
         label,
         final_score,
-        "video"
+        "video",
+        "video analysis",
+        0
     ))
 
     conn.commit()
@@ -257,48 +325,99 @@ def analyze_video():
 
     return redirect(url_for('results_page'))
 
-# ==============================
-# LOGOUT
-# ==============================
-@app.route('/logout')
-def logout():
-    session.pop('user', None)
-    return redirect(url_for('home'))
-
-# ==============================
-# GET USER HISTORY
-# ==============================
-@app.route('/get_results', methods=['GET'])
-def get_results():
+@app.route('/video_analysis')
+def video_analysis():
     if 'user' not in session:
-        return jsonify({"error": "Unauthorized"}), 401
+        return redirect(url_for('home'))
 
-    conn = sqlite3.connect(DB_PATH)
+    return render_template('video-analysis.html', user_name=session.get("user_name"))
+
+# ==============================
+# FULL ASSESSMENT
+# ==============================
+@app.route('/full_assessment')
+def full_assessment():
+    if 'user' not in session:
+        return redirect(url_for('home'))
+    return "Coming soon"
+
+# ==============================
+# RESULTS PAGE
+# ==============================
+@app.route('/results_page')
+def results_page():
+    if 'user' not in session:
+        return redirect(url_for('home'))
+
+    conn = get_db()
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT prediction, score, type, created_at
+        SELECT prediction, score, type, date
         FROM results
         WHERE user_email = ?
-        ORDER BY created_at DESC
+        ORDER BY date DESC
     """, (session['user'],))
 
     rows = cursor.fetchall()
     conn.close()
 
-    results = []
-    for row in rows:
-        results.append({
-            "prediction": row[0],
-            "score": row[1],
-            "type": row[2],
-            "date": row[3]
-        })
+    results = [
+        {
+            "prediction": r["prediction"],
+            "score": r["score"],
+            "type": r["type"],
+            "date": r["date"]
+        }
+        for r in rows
+    ]
 
-    return jsonify(results)
+    latest = results[0] if results else None
+
+    improvement = None
+    if len(results) >= 2:
+        improvement = results[0]['score'] - results[1]['score']
+
+    return render_template(
+        "results.html",
+        results=results,
+        latest=latest,
+        improvement=improvement
+    )
+    
+# ==============================
+# HISTORY
+# ==============================  
+@app.route('/history')
+def history():
+    if 'user' not in session:
+        return redirect(url_for('home'))
+
+    conn = get_db()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id, prediction, score, type, date
+        FROM results
+        WHERE user_email=?
+        ORDER BY date DESC
+    """, (session['user'],))
+
+    results = cursor.fetchall()
+    conn.close()
+
+    return render_template("history.html", results=results)
+
+# ==============================
+# LOGOUT
+# ==============================
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('home'))
 
 # ==============================
 # RUN
 # ==============================
 if __name__ == '__main__':
-    app.run(debug=True, host = "0.0.0.0")
+    app.run(debug=True)

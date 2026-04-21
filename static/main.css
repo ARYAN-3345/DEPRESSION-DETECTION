@@ -1,62 +1,109 @@
 /* =========================
-   DASHBOARD PAGE STYLES
+   HERO SECTION
 ========================= */
-
-/* Sidebar */
-.sidebar {
-    position: fixed;
-    width: 240px;
-    height: 100vh;
-    background: white;
-    padding: 20px;
-    box-shadow: 2px 0 15px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
-    transform: translateX(0);
+.hero-section {
+    padding: 60px 30px;
 }
 
-.-translate-x-full {
-    transform: translateX(-100%);
-}
-
-.hidden {
-    display: none;
-}
-
-/* Sidebar Title */
-.sidebar-title {
-    font-size: 22px;
+.badge {
+    display: inline-block;
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary);
+    font-size: 14px;
     margin-bottom: 20px;
 }
 
-/* Navigation */
-.sidebar nav a {
-    display: block;
-    padding: 10px;
-    border-radius: 10px;
+.hero-title {
+    font-size: 42px;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.hero-subtitle {
+    color: var(--text-light);
+    margin-bottom: 25px;
+}
+
+.hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* =========================
+   SECTION TITLE
+========================= */
+.section-title {
+    margin-top: 50px;
+    margin-bottom: 25px;
+}
+
+.section-title h2 {
+    font-size: 28px;
+}
+
+/* =========================
+   FEATURES GRID
+========================= */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+}
+
+.feature-card {
+    text-align: center;
+}
+
+.feature-card .icon {
+    font-size: 28px;
     margin-bottom: 10px;
+}
+
+/* =========================
+   ASSESSMENT ROW
+========================= */
+.assessment-row {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.assessment-card {
+    padding: 15px 20px;
+    border-radius: 15px;
+    background: white;
     text-decoration: none;
     color: var(--text-dark);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
     transition: 0.2s;
 }
 
-.sidebar nav a:hover {
-    background: #f3f4f6;
+.assessment-card:hover {
+    transform: translateY(-5px);
 }
 
-/* Active link */
-.sidebar nav a.active {
-    background: rgba(37, 99, 235, 0.1);
-    color: var(--primary);
-    font-weight: 600;
+/* =========================
+   CTA BOX
+========================= */
+.cta-box {
+    margin-top: 50px;
+    padding: 40px;
+    border-radius: 20px;
+    background: linear-gradient(to right, var(--primary), var(--secondary));
+    color: white;
 }
 
-/* Main content */
-.main-content {
-    margin-left: 240px;
-    padding: 30px;
+.cta-box h2 {
+    margin-bottom: 10px;
 }
 
-/* Center text */
-.text-center {
-    text-align: center;
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .features-grid,
+    .latest-grid {
+        grid-template-columns: 1fr;
+    }
 }

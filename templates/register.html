@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - DepreSenseX</title>
 
-    <!-- CSS -->
-    <link rel="stylesheet" href="static/global.css">
-    <link rel="stylesheet" href="static/register.css">
+    <link rel="stylesheet" href="/static/global.css">
+    <link rel="stylesheet" href="/static/register.css">
 
-    <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 
@@ -17,7 +16,7 @@
 
     <div class="register-wrapper">
 
-        <div class="card fade-in">
+        <div class="card register-card fade-in">
 
             <!-- Logo -->
             <div class="logo-box">
@@ -26,32 +25,146 @@
 
             <!-- Title -->
             <h1 class="title text-center">Create Account</h1>
-            <p class="subtitle text-center">Join your wellness journey</p>
+            <p class="subtitle text-center">Start your mental health journey today</p>
 
-            <!-- Form -->
-            <form method="POST" action="/register">
+            <!-- Flash -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+            {% endwith %}
 
-                <input class="input" type="email" name="email" placeholder="Email" required>
-                <br><br>
+            <form method="POST" action="/register" id="registerForm">
 
-                <input class="input" type="password" name="password" placeholder="Password" required>
-                <br><br>
+                <!-- NAME -->
+                <label>Full Name</label>
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" name="name" placeholder="Enter your name" required>
+                </div>
 
-                <button type="submit" class="btn btn-primary full-width" id="registerBtn">
-                    <i class="fas fa-user-plus"></i> Register
+                <!-- EMAIL -->
+                <label>Email</label>
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" name="email" placeholder="you@example.com" required
+                        onchange="resetOtp()">
+                </div>
+
+                <!-- SEND OTP -->
+                <button type="button" id="sendBtn" class="btn btn-primary full-width">
+                    Send OTP
+                </button>
+
+                <!-- OTP -->
+                <div class="input-group">
+                    <i class="fas fa-key"></i>
+                    <input type="text" id="otp_input" placeholder="Enter 6-digit OTP">
+                </div>
+
+                <!-- VERIFY -->
+                <button type="button" id="verifyBtn" class="btn btn-primary full-width">
+                    Verify OTP
+                </button>
+
+                <p id="otp-status" class="text-center"></p>
+
+                <!-- PASSWORD -->
+                <label>Password</label>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" name="password" placeholder="Create your password" required>
+                </div>
+
+                <!-- SUBMIT -->
+                <button type="submit" class="btn btn-primary full-width">
+                    Create Account →
                 </button>
 
             </form>
 
-            <!-- Login Link -->
             <p class="login-text">
                 Already have an account?
-                <a href="/">Login</a>
+                <a href="/">Sign in</a>
             </p>
 
         </div>
 
     </div>
 
+    <script>
+        let otpVerified = false;
+
+        document.getElementById("sendBtn").onclick = async () => {
+            const email = document.getElementById("email").value;
+
+            if (!email) {
+                alert("Enter email first");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("email", email);
+
+            const res = await fetch("/send_otp", { method: "POST", body: formData });
+            const data = await res.json();
+
+            const msg = document.getElementById("otp-status");
+
+            if (data.status === "success") {
+                otpVerified = false; // 🔥 reset on new OTP
+                msg.innerText = "OTP sent successfully";
+                msg.style.color = "#10b981";
+            } else {
+                msg.innerText = data.message;
+                msg.style.color = "#ef4444";
+            }
+        };
+
+        document.getElementById("verifyBtn").onclick = async () => {
+            const email = document.getElementById("email").value;
+            const otp = document.getElementById("otp_input").value;
+
+            if (!otp) {
+                alert("Enter OTP");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("email", email);
+            formData.append("otp", otp);
+
+            const res = await fetch("/verify_otp", { method: "POST", body: formData });
+            const data = await res.json();
+
+            const msg = document.getElementById("otp-status");
+
+            if (data.status === "success") {
+                otpVerified = true;
+                msg.innerText = "Email verified successfully";
+                msg.style.color = "#10b981";
+            } else {
+                otpVerified = false;
+                msg.innerText = data.message;
+                msg.style.color = "#ef4444";
+            }
+        };
+
+        document.getElementById("registerForm").addEventListener("submit", function (e) {
+            if (!otpVerified) {
+                e.preventDefault();
+                const msg = document.getElementById("otp-status");
+                msg.innerText = "Please verify OTP first";
+                msg.style.color = "#ef4444";
+            }
+        });
+
+        function resetOtp() {
+            otpVerified = false;
+            document.getElementById("otp-status").innerText = "";
+        }
+    </script>
+
 </body>
+
 </html>

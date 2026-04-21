@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% block title %}Results{% endblock %}
-{% block result_active %}active{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
@@ -9,35 +8,121 @@
 
 {% block content %}
 
-<div class="container fade-in">
+<div class="results-wrapper">
 
-    <!-- Title -->
-    <div class="card text-center">
-        <h1 class="title">Your Wellness Report</h1>
-    </div>
+    <!-- ===================== -->
+    <!-- 🔥 TOP SUMMARY CARD -->
+    <!-- ===================== -->
+    <div class="summary-card">
 
-    <!-- Latest Result -->
-    <div class="card text-center">
-        <h2 class="title">{{ latest.prediction }}</h2>
-        <p class="subtitle">Score: {{ latest.score }}</p>
-    </div>
+        <div class="summary-left">
+            <p class="label">Assessment Type</p>
+            <h3>{{ latest.type | upper }}</h3>
+        </div>
 
-    <!-- History -->
-    <div class="card">
-        <h2 class="title">History</h2>
+        <div class="summary-center">
+            <p class="label">Final Score</p>
+            <h1>{{ latest.score }}</h1>
+        </div>
 
-        {% if results %}
-            {% for item in results %}
-                <div class="card">
-                    <p><strong>Type:</strong> {{ item.type }}</p>
-                    <p><strong>Prediction:</strong> {{ item.prediction }}</p>
-                    <p><strong>Score:</strong> {{ item.score }}</p>
-                    <p><strong>Date:</strong> {{ item.date }}</p>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No past results found</p>
+
+        <div class="level-section">
+            <p class="level-label">Depression Level</p>
+
+            <div class="level-badge {{ latest.prediction|lower }}">
+                <span class="dot"></span>
+                {{ latest.prediction }}
+            </div>
+        </div>
+
+
+        {% if improvement is not none %}
+        <div class="summary-improvement">
+            {% if improvement > 0 %}
+            <span class="improve positive">⬇ {{ improvement }} points better than last time</span>
+            {% elif improvement < 0 %} <span class="improve negative">⬆ {{ improvement|abs }} points worse than last
+                time</span>
+                {% else %}
+                <span class="improve neutral">No change from last time</span>
+                {% endif %}
+        </div>
         {% endif %}
+
+    </div>
+
+
+    <!-- ===================== -->
+    <!-- 🎯 ACTION BUTTONS -->
+    <!-- ===================== -->
+    <div class="action-row">
+
+        <a href="{{ url_for('assessment') }}" class="btn-primary">
+            💡 View Suggestions
+        </a>
+
+        <a href="#history" class="btn-secondary">
+            🕒 View History
+        </a>
+
+        <a href="{{ url_for('results_page') }}" class="btn-outline">
+            📊 Full Report
+        </a>
+
+    </div>
+
+
+    <!-- ===================== -->
+    <!-- 📊 EXTRA INSIGHTS -->
+    <!-- ===================== -->
+    <div class="insight-grid">
+
+        <div class="card insight-card">
+            <h4>🧠 Insight</h4>
+            <p>
+                {% if latest.prediction == "Low" %}
+                You're doing well. Keep maintaining your habits.
+                {% elif latest.prediction == "Medium" %}
+                Some signs of stress detected. Consider improving routine.
+                {% else %}
+                High risk detected. Consider professional help.
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="card insight-card">
+            <h4>📅 Last Assessment</h4>
+            <p>{{ latest.date }}</p>
+        </div>
+
+    </div>
+
+
+    <!-- ===================== -->
+    <!-- 📜 HISTORY -->
+    <!-- ===================== -->
+    <div class="card history-section" id="history">
+
+        <h2>History</h2>
+
+        {% for item in results %}
+        <div class="history-item">
+
+            <div>
+                <strong>{{ item.type }}</strong><br>
+                <span>{{ item.prediction }}</span>
+            </div>
+
+            <div>
+                Score: {{ item.score }}
+            </div>
+
+            <div>
+                {{ item.date }}
+            </div>
+
+        </div>
+        {% endfor %}
+
     </div>
 
 </div>

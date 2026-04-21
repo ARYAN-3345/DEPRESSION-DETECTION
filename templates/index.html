@@ -1,60 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - DepreSenseX</title>
 
-    <!-- Global + Page CSS -->
-    <link rel="stylesheet" href="static/global.css">
-    <link rel="stylesheet" href="static/index.css">
+    <link rel="stylesheet" href="/static/global.css">
+    <link rel="stylesheet" href="/static/index.css">
 
-    <!-- Icons -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 
 <body class="center">
 
-    <div class="login-wrapper">
+<div class="login-wrapper">
 
-        <!-- Card -->
-        <div class="card fade-in">
+    <div class="card login-card fade-in">
 
-            <!-- Logo -->
-            <div class="logo-box">
-                <i class="fas fa-brain"></i>
+        <!-- Logo -->
+        <div class="logo-box">
+            <i class="fas fa-brain"></i>
+        </div>
+
+        <!-- Title -->
+        <h1 class="title text-center">DepreSenseX</h1>
+        <p class="subtitle text-center">
+            Sign in to continue your mental health journey
+        </p>
+
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endwith %}
+
+        <!-- Form -->
+        <form method="POST" action="/login">
+
+            <label>Email</label>
+            <div class="input-group">
+                <i class="fas fa-envelope"></i>
+                <input type="email" name="email" placeholder="you@example.com" required>
             </div>
 
-            <!-- Title -->
-            <h1 class="title text-center">DepreSenseX</h1>
-            <p class="subtitle text-center">Start your wellness journey</p>
+            <label>Password</label>
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" name="password" placeholder="Enter your password" required>
+            </div>
 
-            <!-- Login Form -->
-            <form method="POST" action="/login">
+            <button type="submit" class="btn btn-primary full-width">
+                Sign In →
+            </button>
 
-                <input class="input" type="email" name="email" placeholder="Email" required>
-                <br><br>
+        </form>
 
-                <input class="input" type="password" name="password" placeholder="Password" required>
-                <br><br>
-
-                <button type="submit" class="btn btn-primary full-width">
-                    Login
-                </button>
-
-            </form>
-
-            <!-- Register -->
-            <p class="register-text">
-                New user?
-                <a href="/register">Create account</a>
-            </p>
-
-        </div>
+        <p class="register-text">
+            Don't have an account?
+            <a href="/register">Create one</a>
+        </p>
 
     </div>
 
-</body>
+</div>
 
+</body>
 </html>
