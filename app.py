@@ -7,12 +7,13 @@ import json
 # Import modules
 from modules.quiz import predict_result, questions as quiz_questions
 from modules.voice import assess_depression
-from modules.face import analyze_frames
+from modules.face import analyze_frames, capture_backend_frames
 from modules.fusion import get_fused_score
 from modules.recommendations import get_recommendations
 from db import init_db, create_user, get_user_by_email, save_result, get_results_by_email
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 CORS(app, supports_credentials=True)
 
 app.secret_key = "super_secret_key_123"
@@ -275,13 +276,8 @@ def analyze_full():
     voice_result = assess_depression(responses)
     voice_normalized = voice_result.get("normalized_score", 0.0)
     
-    # 2. Analyze Face Frames
-    video_frames_str = request.form.get('video_frames', '[]')
-    try:
-        video_frames = json.loads(video_frames_str)
-    except:
-        video_frames = []
-        
+    # 2. Analyze Face Frames (Captured directly from backend webcam)
+    video_frames = capture_backend_frames(count=20)
     face_result = analyze_frames(video_frames)
     face_depression_score = face_result.get("face_depression_score", 0.5)
     

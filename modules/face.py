@@ -32,11 +32,35 @@ def decode_base64_image(b64_string):
         print(f"Error decoding image: {e}")
         return None
 
+def capture_backend_frames(count=20):
+    """
+    Captures frames directly from the webcam using OpenCV.
+    Note: This works only if the server has a physical camera attached.
+    """
+    cap = cv2.VideoCapture(0)
+    frames = []
+    if not cap.isOpened():
+        print("Error: Could not open webcam for backend capture.")
+        return []
+
+    # Warm up camera
+    for _ in range(5):
+        cap.read()
+
+    for _ in range(count):
+        ret, frame = cap.read()
+        if ret:
+            frames.append(frame)
+    
+    cap.release()
+    return frames
+
 def analyze_frames(frames_data):
     """
-    Analyzes a list of frame dictionaries containing base64 data.
-    Expected format: [{'timestamp': 1234, 'data': 'base64str'}, ...]
-    Returns a dictionary with face analysis results.
+    Analyzes a list of frames.
+    Can handle:
+    - List of dicts with base64: [{'data': '...'}]
+    - List of raw OpenCV frames (numpy arrays)
     """
     if not frames_data:
         return {
@@ -53,11 +77,17 @@ def analyze_frames(frames_data):
     emotion_totals = {}
 
     for frame_obj in frames_data:
-        b64_str = frame_obj.get("data")
-        if not b64_str:
+        # Check if it's a raw frame (numpy array) or a dict with base64
+        if isinstance(frame_obj, np.ndarray):
+            img = frame_obj
+        elif isinstance(frame_obj, dict):
+            b64_str = frame_obj.get("data")
+            if not b64_str:
+                continue
+            img = decode_base64_image(b64_str)
+        else:
             continue
-            
-        img = decode_base64_image(b64_str)
+
         if img is None:
             continue
 
@@ -71,7 +101,6 @@ def analyze_frames(frames_data):
             )
             analysis = results[0] if isinstance(results, list) else results
             raw_emotions = analysis["emotion"]
-            dominant = analysis["dominant_emotion"]
             
             # Normalize emotions
             total = sum(raw_emotions.values()) or 1.0
@@ -96,7 +125,7 @@ def analyze_frames(frames_data):
     if valid_frames == 0:
         return {
             "avg_face_score": 0.5,
-            "face_depression_score": 0.5, # 1.0 - 0.5
+            "face_depression_score": 0.5,
             "dominant_emotion_overall": "neutral",
             "emotion_distribution": {},
             "face_detected_ratio": 0.0,
@@ -104,7 +133,7 @@ def analyze_frames(frames_data):
         }
 
     avg_score = round(float(sum(face_scores) / valid_frames), 4)
-    face_depression_score = round(1.0 - avg_score, 4) # Flip positivity to depression
+    face_depression_score = round(1.0 - avg_score, 4) 
     
     emotion_dist = {str(k): round(float(v) / valid_frames, 4) for k, v in emotion_totals.items()}
     dominant_overall = str(max(emotion_dist, key=emotion_dist.get)) if emotion_dist else "neutral"
